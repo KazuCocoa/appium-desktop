@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Tree } from 'antd';
 import LocatorTestModal from './LocatorTestModal';
 import InspectorStyles from './Inspector.css';
+import {getOptimalXPath} from "../../util";
 
 const {TreeNode} = Tree;
 const IMPORTANT_ATTRS = [
@@ -10,7 +11,52 @@ const IMPORTANT_ATTRS = [
   'resource-id',
   'AXDescription',
   'AXIdentifier',
+  'height',
+  'width',
+  'x',
+  'y',
+  'enabled',
+  'visible'
 ];
+
+
+// Attributes on nodes that we know are unique to the node
+const uniqueAttributes = [
+  'name',
+  'content-desc',
+  'id',
+  'accessibility-id'
+];
+
+/**
+ * Translates sourceXML to JSON
+ */
+function xmlToJSON (source) {
+  let xmlDoc;
+  let recursive = (xmlNode, parentPath, index) => {
+
+    // Translate attributes array to an object
+    let attrObject = {};
+    for (let attribute of xmlNode.attributes || []) {
+      attrObject[attribute.name] = attribute.value;
+    }
+
+    // Dot Separated path of indices
+    let path = (index !== undefined) && `${!parentPath ? '' : parentPath + '.'}${index}`;
+
+    return {
+      children: [...xmlNode.children].map((childNode, childIndex) => recursive(childNode, path, childIndex)),
+      tagName: xmlNode.tagName,
+      attributes: attrObject,
+      xpath: getOptimalXPath(xmlDoc, xmlNode, uniqueAttributes),
+      path,
+    };
+  };
+
+  xmlDoc = (new DOMParser()).parseFromString(source, 'text/xml');
+  let sourceXML = xmlDoc.children[0];
+  return recursive(sourceXML);
+}
 
 /**
  * Shows the 'source' of the app as a Tree
@@ -34,10 +80,10 @@ export default class Source extends Component {
     return <span>
       &lt;<b className={InspectorStyles.sourceTag}>{tagName}</b>{attrs}&gt;
     </span>;
-  }i
+  }i;
 
   /**
-   * Binds to antd Tree onSelect. If an item is being unselected, path is undefined
+   * Binds to and Tree onSelect. If an item is being unselected, path is undefined
    * otherwise 'path' refers to the element's path.
    */
   handleSelectElement (path) {
@@ -50,9 +96,18 @@ export default class Source extends Component {
     }
   }
 
+  loadXml () {
+    const fs = require('fs');
+    let s = fs.readFileSync('/Users/kazuaki/GitHub/appium-desktop/sample/source.xml', {encoding: 'utf-8'});
+
+    return xmlToJSON(s);
+  }
+
   render () {
-    const {source, sourceError, setExpandedPaths, expandedPaths, selectedElement = {}, showLocatorTestModal} = this.props;
+    const {sourceError, setExpandedPaths, expandedPaths, selectedElement = {}, showLocatorTestModal} = this.props;
     const {path} = selectedElement;
+
+    const source = this.loadXml();
 
     // Recursives through the source and renders a TreeNode for an element
     let recursive = (elemObj) => {
@@ -75,9 +130,6 @@ export default class Source extends Component {
           selectedKeys={[path]}>
           {recursive(source)}
         </Tree>
-      }
-      {!source && !sourceError &&
-        <i>Gathering initial app source...</i>
       }
       {
         sourceError && `Could not obtain source: ${JSON.stringify(sourceError)}`

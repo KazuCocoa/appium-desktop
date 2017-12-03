@@ -94,23 +94,6 @@ function xmlToJSON (source) {
   return recursive(sourceXML);
 }
 
-
-export function bindAppium () {
-  return (dispatch) => {
-    ipcRenderer.on('appium-session-done', () => {
-      notification.error({
-        message: "Error",
-        description: "Session has been terminated",
-        duration: 0
-      });
-      ipcRenderer.removeAllListeners('appium-client-command-response');
-      ipcRenderer.removeAllListeners('appium-client-command-response-error');
-      dispatch({type: SESSION_DONE});
-    });
-  };
-}
-
-
 // A debounced function that calls findElement and gets info about the element
 const findElement = _.debounce(async function (strategyMap, dispatch, getState, path) {
   for (let [strategy, selector] of strategyMap) {
@@ -188,25 +171,14 @@ export function applyClientMethod (params) {
                       getState().inspector.isRecording;
     try {
       dispatch({type: METHOD_CALL_REQUESTED});
-      let {source, screenshot, result, sourceError, screenshotError, 
-        variableName, variableIndex, strategy, selector} = await callClientMethod(params);
-      if (isRecording) {
-        // Add 'findAndAssign' line of code. Don't do it for arrays though. Arrays already have 'find' expression
-        if (strategy && selector && !variableIndex && variableIndex !== 0) {
-          findAndAssign(strategy, selector, variableName, false)(dispatch, getState);
-        }
+      let {source, screenshot, result, sourceError, screenshotError} = await callClientMethod(params);
 
-        // now record the actual action
-        let args = [variableName, variableIndex];
-        args = args.concat(params.args || []);
-        dispatch({type: RECORD_ACTION, action: params.methodName, params: args });
-      }
       dispatch({type: METHOD_CALL_DONE});
       dispatch({
         type: SET_SOURCE_AND_SCREENSHOT, 
         source: source && xmlToJSON(source), 
         sourceXML: source,
-        screenshot, 
+        screenshot,
         sourceError, 
         screenshotError,
       });

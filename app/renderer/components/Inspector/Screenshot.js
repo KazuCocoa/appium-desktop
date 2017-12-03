@@ -6,6 +6,7 @@ import { Spin, Tooltip } from 'antd';
 import B from 'bluebird';
 import styles from './Inspector.css';
 import { parseCoordinates } from './shared';
+import {getOptimalXPath} from "../../util";
 
 /**
  * Shows screenshot of running application and divs that highlight the elements' bounding boxes
@@ -23,14 +24,59 @@ export default class Screenshot extends Component {
     this.updateScaleRatio = debounce(this.updateScaleRatio.bind(this), 1000);
   }
 
+  // TODO: 重複
   /**
+   * Translates sourceXML to JSON
+   */
+  xmlToJSON (source) {
+    const uniqueAttributes = [
+      'name',
+      'content-desc',
+      'id',
+      'accessibility-id'
+    ];
+
+    let xmlDoc;
+    let recursive = (xmlNode, parentPath, index) => {
+
+      // Translate attributes array to an object
+      let attrObject = {};
+      for (let attribute of xmlNode.attributes || []) {
+        attrObject[attribute.name] = attribute.value;
+      }
+
+      // Dot Separated path of indices
+      let path = (index !== undefined) && `${!parentPath ? '' : parentPath + '.'}${index}`;
+
+      return {
+        children: [...xmlNode.children].map((childNode, childIndex) => recursive(childNode, path, childIndex)),
+        tagName: xmlNode.tagName,
+        attributes: attrObject,
+        xpath: getOptimalXPath(xmlDoc, xmlNode, uniqueAttributes),
+        path,
+      };
+    };
+
+    xmlDoc = (new DOMParser()).parseFromString(source, 'text/xml');
+    let sourceXML = xmlDoc.children[0];
+    return recursive(sourceXML);
+  }
+  loadXml () {
+    const fs = require('fs');
+    let s = fs.readFileSync('/Users/kazuaki/GitHub/appium-desktop/sample/source.xml', {encoding: 'utf-8'});
+
+    return this.xmlToJSON(s);
+  }
+
+
+    /**
    * Calculates the ratio that the image is being scaled by
    */
   updateScaleRatio () {
     const screenshotEl = this.containerEl.querySelector('img');
 
     // now update scale ratio
-    const {x1, x2} = parseCoordinates(this.props.source.children[0].children[0]);
+    const {x1, x2} = parseCoordinates(this.loadXml().children[0].children[0]);
     this.setState({
       scaleRatio: (x2 - x1) / screenshotEl.offsetWidth
     });
@@ -38,15 +84,11 @@ export default class Screenshot extends Component {
   }
 
   async handleScreenshotClick () {
-    const {screenshotInteractionMode, applyClientMethod,
+    const {screenshotInteractionMode,
       swipeStart, swipeEnd, setSwipeStart, setSwipeEnd} = this.props;
     const {x, y} = this.state;
 
     if (screenshotInteractionMode === 'tap') {
-      applyClientMethod({
-        methodName: 'tap',
-        args: [x, y],
-      });
     } else if (screenshotInteractionMode === 'swipe') {
       if (!swipeStart) {
         setSwipeStart(x, y);
@@ -84,11 +126,7 @@ export default class Screenshot extends Component {
   }
 
   async handleDoSwipe () {
-    const {swipeStart, swipeEnd, clearSwipeAction, applyClientMethod} = this.props;
-    await applyClientMethod({
-      methodName: 'swipe',
-      args: [swipeStart.x, swipeStart.y, swipeEnd.x - swipeStart.x, swipeEnd.y - swipeStart.y],
-    });
+    const {clearSwipeAction} = this.props;
     clearSwipeAction();
   }
 
@@ -103,8 +141,7 @@ export default class Screenshot extends Component {
   }
 
   render () {
-    const {screenshot, methodCallInProgress, screenshotInteractionMode,
-      swipeStart, swipeEnd} = this.props;
+    const {screenshotInteractionMode, swipeStart, swipeEnd} = this.props;
     const {scaleRatio, x, y} = this.state;
 
     // If we're tapping or swiping, show the 'crosshair' cursor style
@@ -122,11 +159,11 @@ export default class Screenshot extends Component {
       }
     }
 
-    const screenImg = <img src={`data:image/gif;base64,${screenshot}`} id="screenshot" />;
+    // const screenImg = <img src={`data:image/gif;base64,${screenshot}`} id="screenshot" />;
+    const screenImg = <img src='file:///Users/kazuaki/GitHub/appium-desktop/sample/sample.png' id="screenshot" />;
 
-    // Show the screenshot and highlighter rects. Show loading indicator if a method call is in progress.
-    return <Spin size='large' spinning={!!methodCallInProgress}>
-      <div className={styles.innerScreenshotContainer}>
+      // Show the screenshot and highlighter rects. Show loading indicator if a method call is in progress.
+    return <div className={styles.innerScreenshotContainer}>
         <div ref={(containerEl) => { this.containerEl = containerEl; }}
           style={screenshotStyle}
           onClick={this.handleScreenshotClick.bind(this)}
@@ -140,7 +177,7 @@ export default class Screenshot extends Component {
           {swipeInstructions && <Tooltip visible={true} placement="top" title={swipeInstructions}>{screenImg}</Tooltip>}
           {!swipeInstructions && screenImg}
           {screenshotInteractionMode === 'select' && this.containerEl && <HighlighterRects {...this.props} containerEl={this.containerEl} />}
-          {screenshotInteractionMode === 'swipe' &&  
+          {screenshotInteractionMode === 'swipe' &&
             <svg className={styles.swipeSvg}>
               {swipeStart && !swipeEnd && <circle
                 cx={swipeStart.x / scaleRatio}
@@ -155,7 +192,6 @@ export default class Screenshot extends Component {
             </svg>
           }
         </div>
-      </div>
-    </Spin>;
+      </div>;
   }
 }

@@ -33,7 +33,7 @@
 }
 
 .inspector-main .screenshot-container {
-  max-width: 500px;
+  max-width: 700px;
   flex-grow: 1;
   flex-shrink: 2;
   flex-basis: 400px;

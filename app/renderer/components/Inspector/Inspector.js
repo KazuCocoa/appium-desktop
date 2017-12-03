@@ -32,8 +32,8 @@ export default class Inspector extends Component {
       window.resizeTo(newWidth, newHeight);
     }
     this.didInitialResize = true;
-    this.props.bindAppium();
-    this.props.applyClientMethod({methodName: 'source'});
+    // this.props.bindAppium();
+    // this.props.applyClientMethod({methodName: 'source'});
     this.props.getSavedActionFramework();
   }
 
@@ -44,20 +44,12 @@ export default class Inspector extends Component {
   }
 
   render () {
-    const {screenshot, screenshotError, selectedElement = {},
-      applyClientMethod, quitSession, isRecording, showRecord, startRecording,
-      pauseRecording, showLocatorTestModal, screenshotInteractionMode} = this.props;
+    const {screenshot, selectedElement = {}, quitSession, showRecord, showLocatorTestModal, screenshotInteractionMode} = this.props;
     const {path} = selectedElement;
 
     let main = <div className={InspectorStyles['inspector-main']}>
       <div id='screenshotContainer' className={InspectorStyles['screenshot-container']}>
-        {screenshot && <Screenshot {...this.props} />}
-        {screenshotError && `Could not obtain screenshot: ${screenshotError}`}
-        {!screenshot && !screenshotError &&
-          <Spin size="large" spinning={true}>
-            <div className={InspectorStyles.screenshotBox} />
-          </Spin>
-        }
+        {<Screenshot {...this.props} />}
       </div>
       <div id='sourceTreeContainer' className={InspectorStyles['source-tree-container']} ref={(div) => this.container = div} >
         {showRecord &&
@@ -69,14 +61,6 @@ export default class Inspector extends Component {
           <Source {...this.props} />
         </Card>
         {this.container && <SourceScrollButtons container={this.container} />}
-      </div>
-      <div id='selectedElementContainer' className={`${InspectorStyles['source-tree-container']} ${InspectorStyles['element-detail-container']}`}>
-        <Card
-         title={<span><Icon type="tag-o" /> Selected Element</span>}
-         className={InspectorStyles['selected-element-card']}>
-         {path && <SelectedElement {...this.props}/>}
-         {!path && <i>Select an element in the source to begin.</i>}
-        </Card>
       </div>
     </div>;
 
@@ -103,22 +87,6 @@ export default class Inspector extends Component {
     let controls = <div className={InspectorStyles['inspector-toolbar']}>
       {actionControls}
       <ButtonGroup size="large">
-        <Tooltip title="Back">
-          <Button id='btnGoBack' icon='arrow-left' onClick={() => applyClientMethod({methodName: 'back'})}/>
-        </Tooltip>
-        <Tooltip title="Refresh Source & Screenshot">
-          <Button id='btnReload' icon='reload' onClick={() => applyClientMethod({methodName: 'source'})}/>
-        </Tooltip>
-        {!isRecording &&
-         <Tooltip title="Start Recording">
-          <Button id='btnStartRecording' icon="eye-o" onClick={startRecording}/>
-         </Tooltip>
-        }
-        {isRecording &&
-         <Tooltip title="Pause Recording">
-           <Button id='btnPause' icon="pause" type="danger" onClick={pauseRecording}/>
-         </Tooltip>
-        }
         <Tooltip title="Search for element">
            <Button id='searchForElement' icon="search" onClick={showLocatorTestModal}/>
         </Tooltip>
