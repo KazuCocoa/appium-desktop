@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Card, Select, Tooltip, Button, Icon } from 'antd';
 import InspectorStyles from './Inspector.css';
-import frameworks from '../../lib/client-frameworks';
 import { highlight } from 'highlight.js';
 
 const Option = Select.Option;

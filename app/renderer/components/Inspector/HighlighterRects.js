@@ -19,50 +19,6 @@ export default class HighlighterRects extends Component {
     this.updateScaleRatio = debounce(this.updateScaleRatio.bind(this), 1000);
   }
 
-  // TODO: 重複
-  /**
-   * Translates sourceXML to JSON
-   */
-  xmlToJSON (source) {
-    const uniqueAttributes = [
-      'name',
-      'content-desc',
-      'id',
-      'accessibility-id'
-    ];
-
-    let xmlDoc;
-    let recursive = (xmlNode, parentPath, index) => {
-
-      // Translate attributes array to an object
-      let attrObject = {};
-      for (let attribute of xmlNode.attributes || []) {
-        attrObject[attribute.name] = attribute.value;
-      }
-
-      // Dot Separated path of indices
-      let path = (index !== undefined) && `${!parentPath ? '' : parentPath + '.'}${index}`;
-
-      return {
-        children: [...xmlNode.children].map((childNode, childIndex) => recursive(childNode, path, childIndex)),
-        tagName: xmlNode.tagName,
-        attributes: attrObject,
-        xpath: getOptimalXPath(xmlDoc, xmlNode, uniqueAttributes),
-        path,
-      };
-    };
-
-    xmlDoc = (new DOMParser()).parseFromString(source, 'text/xml');
-    let sourceXML = xmlDoc.children[0];
-    return recursive(sourceXML);
-  }
-  loadXml () {
-    const fs = require('fs');
-    let s = fs.readFileSync('/Users/kazuaki/GitHub/appium-desktop/sample/source.xml', {encoding: 'utf-8'});
-
-    return this.xmlToJSON(s);
-  }
-
   /**
    * Calculates the ratio that the image is being scaled by
    */
@@ -70,7 +26,7 @@ export default class HighlighterRects extends Component {
     const screenshotEl = this.props.containerEl.querySelector('img');
 
     // now update scale ratio
-    const {x1, x2} = parseCoordinates(this.loadXml().children[0].children[0]);
+    const {x1, x2} = parseCoordinates(this.props.source.children[0].children[0]);
     this.setState({
       scaleRatio: (x2 - x1) / screenshotEl.offsetWidth
     });

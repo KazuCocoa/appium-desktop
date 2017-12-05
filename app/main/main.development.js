@@ -1,5 +1,4 @@
 import { app, BrowserWindow, Menu } from 'electron';
-import { initializeIpc } from './appium';
 import menuTemplates from './menus';
 import path from 'path';
 import shellEnv from 'shell-env';

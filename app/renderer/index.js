@@ -4,7 +4,6 @@ import { Provider } from 'react-redux';
 import { Router, hashHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import electron from 'electron';
-import WrongFolder from './components/WrongFolder/WrongFolder';
 import routes from './routes';
 import configureStore from './store/configureStore';
 import './styles/app.global.css';

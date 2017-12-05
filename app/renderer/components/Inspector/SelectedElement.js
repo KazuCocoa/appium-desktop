@@ -24,18 +24,10 @@ export default class SelectedElement extends Component {
     hideSendKeysModal();
   }
 
-  //TODO: 重複
-  loadXml () {
-    const fs = require('fs');
-    return fs.readFileSync('/Users/kazuaki/GitHub/appium-desktop/sample/source.xml', {encoding: 'utf-8'});
-  }
-
   render () {
     const {applyClientMethod, setFieldValue, sendKeys, selectedElement, sendKeysModalVisible, showSendKeysModal, 
-      hideSendKeysModal, selectedElementId:elementId, elementInteractionsNotAvailable} = this.props;
+      hideSendKeysModal, selectedElementId:elementId, sourceXML, elementInteractionsNotAvailable} = this.props;
     const {attributes, xpath} = selectedElement;
-
-    const sourceXML = this.loadXml();
 
     // Get the columns for the attributes table
     let attributeColumns = [{

@@ -1,13 +1,10 @@
 import { ipcRenderer } from 'electron';
-import { notification } from 'antd';
 import { push } from 'react-router-redux';
 import _ from 'lodash';
 import B from 'bluebird';
 import { getLocators } from '../components/Inspector/shared';
-import { showError } from './Session';
 import { callClientMethod } from './shared';
 import { getOptimalXPath } from '../util';
-import frameworks from '../lib/client-frameworks';
 import settings from '../../settings';
 
 export const SET_SESSION_DETAILS = 'SET_SESSION_DETAILS';
@@ -134,13 +131,12 @@ export function selectElement (path) {
     dispatch({type: SET_EXPANDED_PATHS, paths: expandedPaths});
 
     // Find the optimal selection strategy. If none found, fall back to XPath.
-    // const strategyMap = _.toPairs(getLocators(selectedElementAttributes, sourceXML));
-
+    const strategyMap = _.toPairs(getLocators(selectedElementAttributes, sourceXML));
 
     strategyMap.push(['xpath', selectedElementXPath]);
 
     // Debounce find element so that if another element is selected shortly after, cancel the previous search
-    // await findElement(strategyMap, dispatch, getState, path);
+    await findElement(strategyMap, dispatch, getState, path);
   };
 }
 
@@ -162,38 +158,6 @@ export function unselectHoveredElement (path) {
   };
 }
 
-//TODO: 重複
-
-/**
- * Translates sourceXML to JSON
- */
-function xmlToJSON (source) {
-  let xmlDoc;
-  let recursive = (xmlNode, parentPath, index) => {
-
-      // Translate attributes array to an object
-      let attrObject = {};
-      for (let attribute of xmlNode.attributes || []) {
-          attrObject[attribute.name] = attribute.value;
-      }
-
-      // Dot Separated path of indices
-      let path = (index !== undefined) && `${!parentPath ? '' : parentPath + '.'}${index}`;
-
-      return {
-          children: [...xmlNode.children].map((childNode, childIndex) => recursive(childNode, path, childIndex)),
-          tagName: xmlNode.tagName,
-          attributes: attrObject,
-          xpath: getOptimalXPath(xmlDoc, xmlNode, uniqueAttributes),
-          path,
-      };
-  };
-
-  xmlDoc = (new DOMParser()).parseFromString(source, 'text/xml');
-  let sourceXML = xmlDoc.children[0];
-  return recursive(sourceXML);
-}
-
 function loadXml () {
   const fs = require('fs');
   let s = fs.readFileSync('/Users/kazuaki/GitHub/appium-desktop/sample/source.xml', {encoding: 'utf-8'});
@@ -206,7 +170,7 @@ function loadXml () {
  * Requests a method call on appium
  */
 export function applyClientMethod (params) {
-  return async (dispatch, getState) => {
+  return (dispatch) => {
     try {
       dispatch({type: METHOD_CALL_REQUESTED});
 

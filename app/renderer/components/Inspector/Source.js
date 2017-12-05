@@ -96,18 +96,9 @@ export default class Source extends Component {
     }
   }
 
-  loadXml () {
-    const fs = require('fs');
-    let s = fs.readFileSync('/Users/kazuaki/GitHub/appium-desktop/sample/source.xml', {encoding: 'utf-8'});
-
-    return xmlToJSON(s);
-  }
-
   render () {
-    const {sourceError, setExpandedPaths, expandedPaths, selectedElement = {}, showLocatorTestModal} = this.props;
+    const {source, sourceError, setExpandedPaths, expandedPaths, selectedElement = {}, showLocatorTestModal} = this.props;
     const {path} = selectedElement;
-
-    const source = this.loadXml();
 
     // Recursives through the source and renders a TreeNode for an element
     let recursive = (elemObj) => {
