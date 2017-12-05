@@ -33,7 +33,7 @@ export default class Inspector extends Component {
     }
     this.didInitialResize = true;
     // this.props.bindAppium();
-    // this.props.applyClientMethod({methodName: 'source'});
+    this.props.applyClientMethod({methodName: 'source'});
     this.props.getSavedActionFramework();
   }
 
