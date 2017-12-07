@@ -131,7 +131,7 @@ export function selectElement (path) {
     dispatch({type: SET_EXPANDED_PATHS, paths: expandedPaths});
 
     // Find the optimal selection strategy. If none found, fall back to XPath.
-    const strategyMap = _.toPairs(getLocators(selectedElementAttributes, sourceXML));
+    const strategyMap = _.toPairs(getLocators(selectedElementAttributes, sourceXML.toString()));
 
     strategyMap.push(['xpath', selectedElementXPath]);
 

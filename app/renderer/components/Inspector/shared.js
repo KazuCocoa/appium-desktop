@@ -37,6 +37,7 @@ const STRATEGY_MAPPINGS = [
 
 export function getLocators (attributes, sourceXML) {
   const res = {};
+
   for (let [strategyAlias, strategy] of STRATEGY_MAPPINGS) {
     const value = attributes[strategyAlias];
     if (value && isUnique(strategyAlias, value, sourceXML)) {
