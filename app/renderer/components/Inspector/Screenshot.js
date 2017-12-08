@@ -7,6 +7,7 @@ import B from 'bluebird';
 import styles from './Inspector.css';
 import { parseCoordinates } from './shared';
 import {getOptimalXPath} from "../../util";
+import Inspector from "./Inspector";
 
 /**
  * Shows screenshot of running application and divs that highlight the elements' bounding boxes
@@ -95,6 +96,11 @@ export default class Screenshot extends Component {
     window.removeEventListener('resize', this.updateScaleRatio);
   }
 
+  getScreenshotFile () {
+    let container = document.getElementById('screenshot-path');
+    return 'file://' + container.value;
+  }
+
   render () {
     const {screenshotInteractionMode, swipeStart, swipeEnd} = this.props;
     const {scaleRatio, x, y} = this.state;
@@ -116,7 +122,8 @@ export default class Screenshot extends Component {
 
     // const screenImg = <img src={`data:image/gif;base64,${screenshot}`} id="screenshot" />;
     // const screenImg = <img src='file:///Users/kazuaki/GitHub/appium-desktop/sample/sample.png' id="screenshot" />;
-    const screenImg = <img src={`file://${this.screenshotPath}`} id="screenshot" />;
+    console.log(this.getScreenshotFile());
+    const screenImg = <img src={this.getScreenshotFile()} id="screenshot" />;
 
       // Show the screenshot and highlighter rects. Show loading indicator if a method call is in progress.
     return <div className={styles.innerScreenshotContainer}>

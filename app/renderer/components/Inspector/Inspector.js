@@ -64,7 +64,9 @@ export default class Inspector extends Component {
 
   setFilePath (path) {
     this.screenshotPath = path;
-    console.log(this.screenshotPath);
+
+    let container = document.getElementById('screenshot-path');
+    container.value = path;
   }
 
   render () {
@@ -126,7 +128,7 @@ export default class Inspector extends Component {
       </ButtonGroup>
       <FormItem >
           <div>
-              <Input placeholder='Value' addonAfter={buttonAfter} size="large"/>
+              <Input placeholder='Value' id='screenshot-path' addonAfter={buttonAfter} size="large"/>
           </div>;
       </FormItem>
     </div>;
