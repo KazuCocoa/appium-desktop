@@ -160,6 +160,7 @@ export function unselectHoveredElement (path) {
 
 function loadXml () {
   const fs = require('fs');
+  // FIXME: Make changeable
   let s = fs.readFileSync('/Users/kazuaki/GitHub/appium-desktop/sample/source.xml', {encoding: 'utf-8'});
 
   return xmlToJSON(s);

@@ -96,9 +96,11 @@ export default class Screenshot extends Component {
     window.removeEventListener('resize', this.updateScaleRatio);
   }
 
+  // FIXME: Make changeable
   getScreenshotFile () {
     let container = document.getElementById('screenshot-path');
-    return 'file://' + container.value;
+    // return 'file://' + container.value;
+    return 'file:///Users/kazuaki/GitHub/appium-desktop/sample/sample.png';
   }
 
   render () {
