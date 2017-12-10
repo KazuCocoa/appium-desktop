@@ -29,7 +29,7 @@ export default class HighlighterRects extends Component {
     try {
       const {x1, x2} = parseCoordinates(this.props.source.children[0].children[0]);
       this.setState({
-          scaleRatio: (x2 - x1) / screenshotEl.offsetWidth
+        scaleRatio: (x2 - x1) / screenshotEl.offsetWidth
       });
     } catch (error) {
         console.log('no screenshot: ' + error);

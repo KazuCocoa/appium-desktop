@@ -8,8 +8,6 @@ import SourceScrollButtons from './SourceScrollButtons';
 import InspectorStyles from './Inspector.css';
 import RecordedActions from './RecordedActions';
 import { remote } from 'electron';
-import settings from "../../../settings";
-
 
 const fs = require('fs');
 const ButtonGroup = Button.Group;
@@ -137,11 +135,6 @@ export default class Inspector extends Component {
             type={screenshotInteractionMode === 'select' ? 'primary' : 'default'}
           />
         </Tooltip>
-        <Tooltip title="Swipe By Coordinates">
-          <Button icon='swap-right' onClick={() => {this.screenshotInteractionChange('swipe');}}
-            type={screenshotInteractionMode === 'swipe' ? 'primary' : 'default'}
-          />
-        </Tooltip>
         <Tooltip title="Tap By Coordinates">
           <Button icon='scan' onClick={() => {this.screenshotInteractionChange('tap');}}
             type={screenshotInteractionMode === 'tap' ? 'primary' : 'default'}
@@ -163,11 +156,11 @@ export default class Inspector extends Component {
           <Button id='btnClose' icon='close' onClick={() => this.cleanSourceAndScreen()}/>
         </Tooltip>
       </ButtonGroup>
-      <FormItem >
-          <div>
-              <Input placeholder='screenshot path' id='screenshot-path' addonAfter={buttonScreen} size="large"/>
-              <Input placeholder='source path' id='source-path' addonAfter={buttonSource} size="large"/>
-          </div>
+      <FormItem>
+        <Input placeholder='screenshot path' id='screenshot-path' addonAfter={buttonScreen} size="large"/>
+      </FormItem>
+      <FormItem>
+        <Input placeholder='source path' id='source-path' addonAfter={buttonSource} size="large"/>
       </FormItem>
     </div>;
 
