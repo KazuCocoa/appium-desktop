@@ -5,6 +5,7 @@ import InspectorPage from './containers/InspectorPage';
 
 export default (
   <Route path="/" component={App}>
-    <IndexRoute component={InspectorPage} />
+    <IndexRoute component={StartServerPage} />
+    <Route path="inspector" component={InspectorPage} />
   </Route>
 );
