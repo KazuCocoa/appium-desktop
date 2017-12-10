@@ -32,11 +32,14 @@ export default class Screenshot extends Component {
     const screenshotEl = this.containerEl.querySelector('img');
 
     // now update scale ratio
-    const {x1, x2} = parseCoordinates(this.props.source.children[0].children[0]);
-    this.setState({
-      scaleRatio: (x2 - x1) / screenshotEl.offsetWidth
-    });
-
+    try {
+      const {x1, x2} = parseCoordinates(this.props.source.children[0].children[0]);
+      this.setState({
+          scaleRatio: (x2 - x1) / screenshotEl.offsetWidth
+      });
+    } catch (error) {
+        console.log('no screenshot: ' + error);
+    }
   }
 
   async handleScreenshotClick () {
@@ -98,9 +101,12 @@ export default class Screenshot extends Component {
 
   // FIXME: Make changeable
   getScreenshotFile () {
-    let container = document.getElementById('screenshot-path');
-    // return 'file://' + container.value;
-    return 'file:///Users/kazuaki/GitHub/appium-desktop/sample/sample.png';
+    const fs = require('fs');
+    try {
+      return 'file://' + fs.readFileSync('./tmp/screen_path.txt', 'utf-8');
+    } catch (error) {
+      console.log('no file:' + error);
+    }
   }
 
   render () {

@@ -10,6 +10,8 @@ import RecordedActions from './RecordedActions';
 import { remote } from 'electron';
 import settings from "../../../settings";
 
+
+const fs = require('fs');
 const ButtonGroup = Button.Group;
 const FormItem = Form.Item;
 
@@ -56,25 +58,60 @@ export default class Inspector extends Component {
   }
 
   reloadScreenshot () {
-    let container = document.getElementById('screenshotContainer');
-    let content = container.innerHTML;
-
-    container.innerHTML = content;
+    location.reload();
+    // let container = document.getElementById('screenshotContainer');
+    // let content = container.innerHTML;
+    //
+    // container.innerHTML = content;
   }
 
-  setFilePath (path) {
-    this.screenshotPath = path;
+  writeFile (dir, filename, data) {
+    fs.mkdir(dir, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
 
+    fs.writeFile(dir + "/" + filename, data, 'utf8', (err) => {
+      if (err) {
+        return console.log(err);
+      }
+    });
+  }
+
+  setScreenshotFilePath (path) {
     let container = document.getElementById('screenshot-path');
     container.value = path;
+
+    this.writeFile('./tmp', 'screen_path.txt', container.value);
+  }
+
+  setSourceFilePath (path) {
+    let container = document.getElementById('source-path');
+    container.value = path;
+
+    this.writeFile('./tmp', 'source_path.txt', container.value);
+  }
+
+  cleanSourceAndScreen () {
+    try {
+      fs.unlinkSync('./tmp/screen_path.txt');
+      fs.unlinkSync('./tmp/source_path.txt');
+      location.reload();
+    } catch (error) {
+      console.log('no file': error);
+    }
   }
 
   render () {
-    const {screenshot, selectedElement = {}, quitSession, showRecord, showLocatorTestModal, screenshotInteractionMode} = this.props;
+    const {screenshot, selectedElement = {}, showRecord, showLocatorTestModal, screenshotInteractionMode} = this.props;
     const {path} = selectedElement;
 
-    const buttonAfter = <Icon type="file"
-                              onClick={() => this.getLocalFilePath((filepath) => this.setFilePath(filepath[0]))} />;
+    const buttonScreen = <Icon type="file"
+                              onClick={() => this.getLocalFilePath((filepath) => this.setScreenshotFilePath(filepath[0]))} />;
+
+    const buttonSource = <Icon type="file"
+                              onClick={() => this.getLocalFilePath((filepath) => this.setSourceFilePath(filepath[0]))} />;
 
     let main = <div className={InspectorStyles['inspector-main']}>
       <div id='screenshotContainer' className={InspectorStyles['screenshot-container']}>
@@ -122,14 +159,15 @@ export default class Inspector extends Component {
         <Tooltip title="Refresh Source & Screenshot">
             <Button id='btnReload' icon='reload' onClick={() => this.reloadScreenshot()}/>
         </Tooltip>
-        <Tooltip title="Quit Session & Close Inspector">
-          <Button id='btnClose' icon='close' onClick={() => quitSession()}/>
+        <Tooltip title="cleanSourceAndScreen">
+          <Button id='btnClose' icon='close' onClick={() => this.cleanSourceAndScreen()}/>
         </Tooltip>
       </ButtonGroup>
       <FormItem >
           <div>
-              <Input placeholder='Value' id='screenshot-path' addonAfter={buttonAfter} size="large"/>
-          </div>;
+              <Input placeholder='screenshot path' id='screenshot-path' addonAfter={buttonScreen} size="large"/>
+              <Input placeholder='source path' id='source-path' addonAfter={buttonSource} size="large"/>
+          </div>
       </FormItem>
     </div>;
 

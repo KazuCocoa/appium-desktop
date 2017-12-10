@@ -26,11 +26,14 @@ export default class HighlighterRects extends Component {
     const screenshotEl = this.props.containerEl.querySelector('img');
 
     // now update scale ratio
-    const {x1, x2} = parseCoordinates(this.props.source.children[0].children[0]);
-    this.setState({
-      scaleRatio: (x2 - x1) / screenshotEl.offsetWidth
-    });
-
+    try {
+      const {x1, x2} = parseCoordinates(this.props.source.children[0].children[0]);
+      this.setState({
+          scaleRatio: (x2 - x1) / screenshotEl.offsetWidth
+      });
+    } catch (error) {
+        console.log('no screenshot: ' + error);
+    }
   }
 
   async handleScreenshotClick () {
