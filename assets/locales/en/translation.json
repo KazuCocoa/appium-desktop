@@ -82,7 +82,7 @@
   "invalidType": "Invalid type {{type}}",
   "presetAdded": "Your preset '{{presetName}}' has been added to the list in the Presets tab!",
   "datetimeFormat": "MMM Do YYYY, h:mma",
-  "updateDetails": "Release Date: {{pubDate}}\n\nRelease Notes: {{notes}}",
+  "updateDetails": "Release Date: {{pubDate}}\n(It does not include pre-release version.)\n\nRelease Notes: {{notes}}",
   "appiumIsAvailable": "Appium Desktop {{name}} is available",
   "updateIsBeingDownloaded": "Update is being downloaded now. You will be notified again when it is complete",
   "updateIsDownloaded": "Appium Desktop {{releaseName}} has been downloaded. Must restart to apply the updates (note: it may take several minutes for Appium Desktop to install and restart)",
