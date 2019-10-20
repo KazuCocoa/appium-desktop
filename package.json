@@ -87,7 +87,7 @@
     ],
     "win": {
       "artifactName": "${productName}-windows-${version}.${ext}",
-      "target": "nsis",
+      "target": "squirrel",
       "icon": "build/icon.ico"
     },
     "nsisWeb": {
@@ -121,6 +121,7 @@
     "bluebird": "^3.5.5",
     "connected-react-router": "^6.0.0",
     "css-modules-require-hook": "^4.2.3",
+    "electron-builder-squirrel-windows": "^21.2.0",
     "electron-debug": "^3.0.0",
     "electron-log": "^3.0.1",
     "electron-settings": "^2.2.4",
