@@ -87,14 +87,11 @@
     ],
     "win": {
       "artifactName": "${productName}-windows-${version}.${ext}",
-      "target": "squirrel",
-      "icon": "build/icon.ico"
+      "target": "squirrel"
     },
-    "nsisWeb": {
-      "oneClick": false
-    },
-    "nsis": {
-      "oneClick": false
+    "squirrelWindows": {
+      "msi": true,
+      "iconUrl": "https://github.com/appium/appium-desktop/blob/master/build/icon.ico?raw=true"
     },
     "linux": {
       "artifactName": "${productName}-linux-${version}.${ext}",
