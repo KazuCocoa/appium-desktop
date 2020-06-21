@@ -73,6 +73,20 @@ function connectStartServer (win) {
     }, LOG_SEND_INTERVAL_MS);
 
     try {
+      // Copy appium-webdriveragent in 'userData' and refer to there
+      const userData = app.getPath('userData')
+      console.log(`userData: ${userData}`)
+      const appRoot = app.getAppPath()
+      // TODO: Remove file if they were old
+      const tempWDAPath = `${userData}/appium-webdriveragent`
+      if (!fs.exists(tempWDAPath)) {
+        await fs.copyFile(`${appRoot}/node_modules/appium/node_modules/appium-webdriveragent`, tempWDAPath)
+      }
+      // Want to change the appium-webdriveragent link by Appium to the above tempWDAPath
+      // to reduce the risk of permission issue
+      console.log('=====')
+      console.log(module)
+
       // set up the appium server running in this thread
       server = await appiumServer(args, true);
       await settings.set('SERVER_ARGS', args);
