@@ -4,7 +4,8 @@ import { ipcMain, app } from 'electron';
 import { main as appiumServer } from 'appium';
 import { getDefaultArgs } from 'appium/build/lib/parser';
 import path from 'path';
-import wd from 'wd';
+// import wd from 'wd';
+import web2driver from 'web2driver';
 import { fs, tempDir } from 'appium-support';
 import _ from 'lodash';
 import settings from '../shared/settings';
@@ -174,26 +175,28 @@ function connectCreateNewSession () {
         killSession(windowId);
       }
 
-      // Create the driver and cache it by the sender ID
-      let driver = wd.promiseChainRemote({
+      // TODO: Should use accessKey, username and proxy
+      const serverOpts = {
         hostname: host,
-        port,
-        path,
-        username,
-        accessKey,
-        https,
-      });
-      driver.configureHttp({rejectUnauthorized, proxy});
-      const handler = createSession(driver, event.sender, windowId);
+        port: port ? port : 4723,
+        path: path ? path : '/wd/hub',
+        protocol: https ? 'https' : 'http'
+      };
+      // const serverOpts = {
+      //   hostname: host,
+      //   port: port ? port : 4723
+      // };
+      const capabilities = desiredCapabilities;
 
+      let driver;
 
       // If we're just attaching to an existing session, do that and
       // short-circuit the rest of the logic
       if (attachSessId) {
+        driver = await web2driver.Web2Driver.attachToSession(attachSessId);
         driver._isAttachedSession = true;
-        await driver.attach(attachSessId);
         // get the session capabilities to prove things are working
-        await driver.sessionCapabilities();
+        await driver.getCapabilities();
         event.sender.send('appium-new-session-ready');
         return;
       }
@@ -203,22 +206,16 @@ function connectCreateNewSession () {
         desiredCapabilities.newCommandTimeout = 0;
       }
 
-      // If someone didn't specify connectHardwareKeyboard, set it to true by
-      // default
-      if (typeof desiredCapabilities.connectHardwareKeyboard === 'undefined') {
-        desiredCapabilities.connectHardwareKeyboard = true;
-      }
+      console.log(desiredCapabilities);
+      console.log(serverOpts);
 
-      // Prevent wd from injecting default desired capabilities
-      if (typeof desiredCapabilities.wdNoDefaults === 'undefined' &&
-          typeof desiredCapabilities['wd-no-defaults'] === 'undefined') {
-        desiredCapabilities.wdNoDefaults = true;
-      }
-
-      // Try initializing it. If it fails, kill it and send error message to sender
-      let p = driver.init(desiredCapabilities);
+      console.log('------- createSEssion');
+      driver = await web2driver.Web2Driver.remote(serverOpts, capabilities);
+      console.log('-------  Web2Driver.remote');
       event.sender.send('appium-new-session-successful');
-      await p;
+
+      // Create the driver and cache it by the sender ID
+      const handler = createSession(driver, event.sender, windowId);
 
       if (host !== '127.0.0.1' && host !== 'localhost') {
         handler.runKeepAliveLoop();
@@ -237,6 +234,7 @@ function connectCreateNewSession () {
 
       event.sender.send('appium-new-session-ready');
     } catch (e) {
+      console.log(e);
       // If the session failed, delete it from the cache
       killSession(event.sender.id);
       event.sender.send('appium-new-session-failed', e);

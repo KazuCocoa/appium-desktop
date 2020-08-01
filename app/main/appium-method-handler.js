@@ -1,5 +1,6 @@
 import Bluebird from 'bluebird';
 import wd from 'wd';
+import web2driver from 'web2driver';
 import log from 'electron-log';
 import _ from 'lodash';
 import { timing } from 'appium-support';
@@ -325,6 +326,7 @@ export default class AppiumMethodHandler {
   async close (reason, killedByUser = false) {
     this.killKeepAliveLoop();
     this.sender.send('appium-session-done', {reason, killedByUser});
+    // TODO: Replace
     if (!this.driver._isAttachedSession) {
       try {
         await this.driver.quit();
