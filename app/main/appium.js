@@ -165,8 +165,9 @@ export function createNewSessionWindow (win) {
 
 function connectCreateNewSession () {
   ipcMain.on('appium-create-new-session', async (event, args) => {
-    const {desiredCapabilities, host, port, path, username, accessKey, https,
-           attachSessId, rejectUnauthorized, proxy} = args;
+    // const {desiredCapabilities, host, port, path, username, accessKey, https,
+    //        attachSessId, rejectUnauthorized, proxy} = args;
+    const {desiredCapabilities, host, port, path, https, attachSessId} = args;
 
     try {
       // If there is an already active session, kill it. Limit one session per window.

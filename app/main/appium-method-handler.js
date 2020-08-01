@@ -1,6 +1,6 @@
 import Bluebird from 'bluebird';
 import wd from 'wd';
-import web2driver from 'web2driver';
+// import web2driver from 'web2driver';
 import log from 'electron-log';
 import _ from 'lodash';
 import { timing } from 'appium-support';
