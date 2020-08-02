@@ -181,7 +181,8 @@ function connectCreateNewSession () {
         hostname: host,
         port: port ? port : 4723,
         path: path ? path : '/wd/hub',
-        protocol: https ? 'https' : 'http'
+        protocol: https ? 'https' : 'http',
+        connectionRetryCount: 0,
       };
       // const serverOpts = {
       //   hostname: host,
